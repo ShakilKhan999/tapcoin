@@ -196,12 +196,14 @@ class HomeView extends StatelessWidget {
                     aspectRatio: 1.0,
                     child: Container(
                       margin: EdgeInsets.all(34.sp),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            Color.fromARGB(255, 4, 57, 101),
-                            Color.fromARGB(255, 31, 32, 33),
+                            controller.isUpdating
+                                ? Colors.grey  // Visual feedback when updating
+                                : const Color.fromARGB(255, 4, 57, 101),
+                            const Color.fromARGB(255, 31, 32, 33),
                           ],
                           center: Alignment.center,
                           radius: 0.8,
@@ -212,7 +214,8 @@ class HomeView extends StatelessWidget {
                         height: 20.h,
                         width: 20.w,
                       ),
-                    ),
+                    )
+                    ,
                   ),
                 );
               },

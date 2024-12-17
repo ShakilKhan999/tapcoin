@@ -1,5 +1,6 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:tap_coin/screens/home_screen.dart';
@@ -27,18 +28,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Tap Coin',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: Colors.black,
-        primarySwatch: Colors.blue,
+    return ScreenUtilInit(
+      child: GetMaterialApp(
+        title: 'Tap Coin',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: Colors.black,
+          primarySwatch: Colors.blue,
+        ),
+        initialBinding: BindingsBuilder(() {
+          Get.put(AuthController(Get.find()));
+        }),
+        home: const InitialView(), // New widget to handle initial routing
       ),
-      initialBinding: BindingsBuilder(() {
-        Get.put(AuthController(Get.find()));
-      }),
-      home: const InitialView(), // New widget to handle initial routing
     );
   }
 }

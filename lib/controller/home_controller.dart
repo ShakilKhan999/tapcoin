@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:tap_coin/services/auth_service.dart';
 import 'package:tap_coin/services/game_service.dart';
@@ -20,6 +21,9 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
 
   Timer? tapResetTimer;
   Timer? refillTimer;
+  Timer? _syncTimer;
+
+  bool get isUpdating => _gameService.isUpdating.value;
 
   @override
   void onInit() {
@@ -40,8 +44,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     );
 
     scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(
-          parent: scaleAnimationController, curve: Curves.easeInOut),
+      CurvedAnimation(parent: scaleAnimationController, curve: Curves.easeInOut),
     );
   }
 
@@ -54,6 +57,10 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
   }
 
   void handleTap(TapDownDetails details, Size size) {
+    if (isUpdating || tapCount.value <= 0) return;
+
+    HapticFeedback.lightImpact();
+
     double newTopPosition = details.localPosition.dy - 30;
     double newLeftPosition = details.localPosition.dx - 15;
 
@@ -71,9 +78,15 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
       tapCount.value--;
     }
 
-    // Update database
+    // Update local storage immediately
     _gameService.updateCoinCount(currencyCount.value);
     _gameService.updateTapCount(tapCount.value);
+
+    // Debounce Firestore sync
+    _syncTimer?.cancel();
+    _syncTimer = Timer(const Duration(milliseconds: 500), () {
+      _gameService.syncWithFirestore();
+    });
 
     // Reset timers
     refillTimer?.cancel();
@@ -95,10 +108,20 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
       if (tapCount.value < 1000) {
         tapCount.value++;
         _gameService.updateTapCount(tapCount.value);
+
+        // Debounce the Firestore sync for refill updates
+        _syncTimer?.cancel();
+        _syncTimer = Timer(const Duration(milliseconds: 500), () {
+          _gameService.syncWithFirestore();
+        });
       } else {
         refillTimer?.cancel();
       }
     });
+  }
+
+  void signOut() async {
+    await _authService.signOut();
   }
 
   @override
@@ -107,6 +130,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
     scaleAnimationController.dispose();
     tapResetTimer?.cancel();
     refillTimer?.cancel();
+    _syncTimer?.cancel();
     super.onClose();
   }
 }
