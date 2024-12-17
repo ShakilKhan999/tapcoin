@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "325090492827",
+    "project_id": "tapcoin-50b27",
+    "storage_bucket": "tapcoin-50b27.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:325090492827:android:d7e1c8f94ef9953307613e",
+        "android_client_info": {
+          "package_name": "com.tapcoin.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQUmjc3VOYwxA_G0FnhO1SgWF3H6PJLpQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
